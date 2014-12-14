@@ -6,12 +6,21 @@ class CSVRecord
 	public $count;
 	public $price;
 	
+	public $existsInProducts;
+	public $existsInAttributes;
+	public $manyInstancesInProducts;
+	public $manyInstancesInAttributes;
 	
     public function __construct($reference, $price, $count)
 	{
         $this->reference = $reference;
 		$this->price = $price;
 		$this->count = $count;
+		
+		$this->existsInProducts = false;
+		$this->existsInAttributes = false;
+		$this->manyInstancesInProducts = false;
+		$this->manyInstancesInAttributes = false;
     }
 	
 	public static function LoadRecordsFromFile($filename)

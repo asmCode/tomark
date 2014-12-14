@@ -97,6 +97,41 @@ function PrintDiffRroductsAttribs($diffProducts)
 	echo "</table>\n";
 }
 
+function PrintErrors($csvRecords)
+{
+	echo "<table border=1>\n";
+	echo "<tr>\n";
+	echo "<th>reference</th>\n";
+	echo "<th>problem</th>\n";
+	echo "</tr>\n";
+	
+	for ($i = 0; $i < count($csvRecords); $i++)
+	{
+		$record = $csvRecords[$i];
+		
+		$errorMsg = "";
+		
+		if ($record->manyInstancesInProducts)
+			$errorMsg = "Wiecej niz jedno wystapienie w produktach";
+		else if ($record->manyInstancesInAttributes)
+			$errorMsg = "Wiecej niz jedno wystapienie w atrybutach";
+		else if (!$record->existsInProducts && !$record->existsInAttributes)
+			$errorMsg = "Nie znaleziono ani w produktach ani w atrybutach";
+		else
+			continue;
+
+		echo "<tr>\n";
+		
+		echo
+		    "<td>" . $record->reference . "</td>" .
+			"<td>" . $errorMsg . "</td>";
+		
+		echo "</tr>\n";
+	}
+	
+	echo "</table>\n";
+}
+
 move_uploaded_file($_FILES["file"]["tmp_name"], "upload/" . $_FILES["file"]["name"]);
 
 $con = ConnectToDatabase();
@@ -118,8 +153,17 @@ for ($i = 0; $i < count($scvRecords); $i++)
 {
 	$query = sprintf($QUERY_PRODUCT_BY_REF_FROM_PRODUCTS, $scvRecords[$i]->reference);
 	$res = mysql_query($query);
-	if (mysql_num_rows($res) != 1)
+	
+	if (mysql_num_rows($res) == 0)
 		continue;
+		
+	else if (mysql_num_rows($res) > 1)
+	{
+		$scvRecords[$i]->manyInstancesInProducts = true;
+		continue;
+	}
+	
+	$scvRecords[$i]->existsInProducts = true;
 	
 	$record = mysql_fetch_object($res);
 	
@@ -142,8 +186,17 @@ for ($i = 0; $i < count($scvRecords); $i++)
 {
 	$query = sprintf($QUERY_PRODUCT_BY_REF_FROM_PRODUCTS_ATTRIBS, $scvRecords[$i]->reference);
 	$res = mysql_query($query);
-	if (mysql_num_rows($res) != 1)
+	
+	if (mysql_num_rows($res) == 0)
 		continue;
+		
+	else if (mysql_num_rows($res) > 1)
+	{
+		$scvRecords[$i]->manyInstancesInAttributes = true;
+		continue;
+	}
+
+	$scvRecords[$i]->existsInAttributes = true;
 	
 	$record = mysql_fetch_object($res);
 	
@@ -166,6 +219,10 @@ PrintDiffRroducts($diffProducts);
 echo "<br />\n";
 echo "<div>Dane z tabeli st_product_attribute</div>\n";
 PrintDiffRroductsAttribs($diffProductsAttribs);
+echo "<br />\n";
+echo "<div>Znalezione problemy</div>\n";
+PrintErrors($scvRecords);
+
 
 mysql_close($con);
 

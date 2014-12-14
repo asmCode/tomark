@@ -29,7 +29,6 @@ function PrintDiffRroducts($diffProducts)
 {
 	echo "<table border=1>\n";
 	echo "<tr>\n";
-	echo "<th>lp</th>\n";
 	echo "<th>id_product</th>\n";
 	echo "<th>reference</th>\n";
 	echo "<th>Nazwa</th>\n";
@@ -46,7 +45,6 @@ function PrintDiffRroducts($diffProducts)
 		echo "<tr>\n";
 		
 		echo
-			"<td>" . (int)($i + 1) . "</td>" .
 			"<td>" . $dp->productId . "</td>" .
 			"<td>" . $dp->reference . "</td>" .
 			"<td>" . $dp->name . "</td>" .
@@ -65,7 +63,6 @@ function PrintDiffRroductsAttribs($diffProducts)
 {
 	echo "<table border=1>\n";
 	echo "<tr>\n";
-	echo "<th>lp</th>\n";
 	echo "<th>id_product_attribute</th>\n";
 	echo "<th>id_product</th>\n";
 	echo "<th>reference</th>\n";
@@ -84,7 +81,6 @@ function PrintDiffRroductsAttribs($diffProducts)
 		echo "<tr>\n";
 		
 		echo
-			"<td>" . (int)($i + 1) . "</td>" .
 		    "<td>" . $dp->productAttributeId . "</td>" .
 			"<td>" . $dp->productId . "</td>" .
 			"<td>" . $dp->reference . "</td>" .
@@ -120,7 +116,7 @@ $diffProductIndex = 0;
 
 for ($i = 0; $i < count($scvRecords); $i++)
 {
-	$query = sprintf($QUERY_PRODUCT_BY_REF_FROM_PRODUCTS, $scvRecords[$i]->reference, $scvRecords[$i]->count, $scvRecords[$i]->price);
+	$query = sprintf($QUERY_PRODUCT_BY_REF_FROM_PRODUCTS, $scvRecords[$i]->reference);
 	$res = mysql_query($query);
 	if (mysql_num_rows($res) != 1)
 		continue;
@@ -144,7 +140,7 @@ $diffProductAttribsIndex = 0;
 
 for ($i = 0; $i < count($scvRecords); $i++)
 {
-	$query = sprintf($QUERY_PRODUCT_BY_REF_FROM_PRODUCTS_ATTRIBS, $scvRecords[$i]->reference, $scvRecords[$i]->count, $scvRecords[$i]->price);
+	$query = sprintf($QUERY_PRODUCT_BY_REF_FROM_PRODUCTS_ATTRIBS, $scvRecords[$i]->reference);
 	$res = mysql_query($query);
 	if (mysql_num_rows($res) != 1)
 		continue;
@@ -164,11 +160,6 @@ for ($i = 0; $i < count($scvRecords); $i++)
 		
 	$diffProductAttribsIndex++;
 }
-
-echo "Statystyki: <br />";
-echo "Całkowita ilość rekordów: " . count($scvRecords) . "<br />";
-echo "Ilość rekorów z inną ceną lub ilością: " . (int)((int)$diffProductIndex + (int)$diffProductAttribsIndex) . "<br />";
-echo "<br />";
 
 echo "<div>Dane z tabeli st_product</div>\n";
 PrintDiffRroducts($diffProducts);

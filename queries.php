@@ -23,9 +23,7 @@ FROM
 	st_product INNER JOIN st_product_lang
 	ON st_product.id_product = st_product_lang.id_product
 WHERE
-	st_product.reference = '%s' AND
-	(CAST(st_product.quantity AS DECIMAL(30, 30)) <> CAST('%s' AS DECIMAL(30, 30)) OR
-	CAST(st_product.price AS DECIMAL(30, 30)) <> CAST('%s' AS DECIMAL(30, 30)))
+	st_product.reference = '%s'
 ";
 
 $QUERY_PRODUCT_BY_REF_FROM_PRODUCTS_ATTRIBS = "
@@ -44,9 +42,7 @@ FROM
 	INNER JOIN st_product ON st_product_attribute.id_product = st_product.id_product
 	INNER JOIN st_product_lang ON st_product_attribute.id_product = st_product_lang.id_product
 WHERE
-	st_product_attribute.reference = '%s' AND
-	(CAST(st_product_attribute.quantity AS DECIMAL(30, 30)) <> CAST('%s' AS DECIMAL(30, 30)) OR
-	CAST(st_product_attribute.price AS DECIMAL(30, 30)) <> CAST('%s' AS DECIMAL(30, 30)))
+	st_product_attribute.reference = '%s'
 ";
 
 $UPDATE_PRODUCTS = "

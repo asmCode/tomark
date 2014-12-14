@@ -44,7 +44,7 @@ class CSVRecord
 			if (count($values) != 3)
 				continue;
 				
-			$records[$recordIndex] = new CSVRecord(trim($values[0]), trim($values[1]), trim($values[2]));
+			$records[$recordIndex] = new CSVRecord(trim($values[0]), str_replace(' ', '', trim($values[1])), str_replace(' ', '', trim($values[2])));
 			$recordIndex++;
 		}
 		

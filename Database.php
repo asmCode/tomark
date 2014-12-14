@@ -1,11 +1,6 @@
 <?php
 
-define('_DB_SERVER_', 'localhost');
-define('_DB_NAME_', 'tomard_shippr');
-define('_DB_USER_', 'tomard_tomship');
-define('_DB_PREFIX_', 'st_');
-define('_DB_PASSWD_', 'h6uQhn98%TGGES$H^w');
-define('_DB_TYPE_', 'MySQL');
+require 'DatabaseDefs.php';
 
 function ConnectToDatabase()
 {

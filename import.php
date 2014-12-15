@@ -115,8 +115,9 @@ function PrintErrors($csvRecords)
 			$errorMsg = "Wiecej niz jedno wystapienie w produktach";
 		else if ($record->manyInstancesInAttributes)
 			$errorMsg = "Wiecej niz jedno wystapienie w atrybutach";
-		else if (!$record->existsInProducts && !$record->existsInAttributes)
-			$errorMsg = "Nie znaleziono ani w produktach ani w atrybutach";
+		//to jest poprawna sytuacja
+		//else if (!$record->existsInProducts && !$record->existsInAttributes)
+		//	$errorMsg = "Nie znaleziono ani w produktach ani w atrybutach";
 		else
 			continue;
 

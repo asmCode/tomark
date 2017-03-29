@@ -31,12 +31,21 @@ for ($i = 0; $i < count($diffProducts); $i++)
 	$record = $diffProducts[$i];
 	
 	$query = sprintf($UPDATE_PRODUCTS, (int)$record->countAfter, $record->priceAfter, $record->productId);
-//	echo $query . "<br />";
+	if (mysql_query($query) != TRUE)
+		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");
+	
+	$query = sprintf($UPDATE_PRODUCTS_SHOP, $record->priceAfter, $record->productId);
+	if (mysql_query($query) != TRUE)
+		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");
+	
+	$query = sprintf($UPDATE_QUANTITY_IN_STOCK_AVAILABLE_FOR_PRODUCTS, $record->countAfter, $record->productId);
 	if (mysql_query($query) != TRUE)
 		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");
 }
 
 echo "Pomyślnie zaktualizowano cenę i ilość w tabeli st_product (" . count($diffProducts) . " rekordów)<br />";
+echo "Pomyślnie zaktualizowano cenę w tabeli st_product_shop (" . count($diffProducts) . " rekordów)<br />";
+echo "Pomyślnie zaktualizowano ilość w tabeli st_stock_available dla produktów (" . count($diffProducts) . " rekordów)<br />";
 
 // Przenies cene z produktu do atrybutow, zaktualizuj cene i ilosc w tabeli st_product_attribute oraz wyzeruj cene w tabeli st_product
 for ($i = 0; $i < count($diffProductsAttribs); $i++)
@@ -55,7 +64,20 @@ for ($i = 0; $i < count($diffProductsAttribs); $i++)
 	}
 	
 	$query = sprintf($UPDATE_PRODUCTS_ATTRIBS, (int)$record->countAfter, $record->priceAfter, $record->productAttributeId);
-//	echo $query . "<br />";
+	if (mysql_query($query) != TRUE)
+	{
+		mysql_query("ROLLBACK");
+		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");
+	}
+	
+	$query = sprintf($UPDATE_PRODUCTS_ATTRIBS_SHOP, $record->priceAfter, $record->productAttributeId);
+	if (mysql_query($query) != TRUE)
+	{
+		mysql_query("ROLLBACK");
+		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");
+	}
+	
+	$query = sprintf($UPDATE_QUANTITY_IN_STOCK_AVAILABLE_FOR_PRODUCT_ATTRIBUTE, $record->countAfter, $record->productAttributeId);
 	if (mysql_query($query) != TRUE)
 	{
 		mysql_query("ROLLBACK");
@@ -64,7 +86,6 @@ for ($i = 0; $i < count($diffProductsAttribs); $i++)
 
 	// niestety dla jednego id produktu moze wystapic kilkukrotne zerowanie - do poprawki (optymalizacja)
 	$query = sprintf($SET_ZERO_PRICE_IN_PRODUCTS, $record->productId);
-//	echo $query . "<br />";
 	if (mysql_query($query) != TRUE)
 	{
 		mysql_query("ROLLBACK");
@@ -75,6 +96,7 @@ for ($i = 0; $i < count($diffProductsAttribs); $i++)
 }
 
 echo "Pomyślnie zaktualizowano cenę i ilość w tabeli st_product_attribute oraz pomyślnie wyzerowano ceny w odpowiednich produktach (" . count($diffProductsAttribs) . " rekordów)<br />";
+echo "Pomyślnie zaktualizowano ilość w tabeli st_stock_available dla atrybutów (" . count($diffProductsAttribs) . " rekordów)<br />";
 
 // Uaktualnij pole quantity w tabeli st_product na podstawie sumy pol quantity w odpowiednich rekordach z tabeli st_product_attribute
 for ($i = 0; $i < count($diffProductsAttribs); $i++)
@@ -82,12 +104,27 @@ for ($i = 0; $i < count($diffProductsAttribs); $i++)
 	$record = $diffProductsAttribs[$i];
 	
 	$query = sprintf($UPDATE_QUANTITY_IN_PRODUCTS, $record->productId, $record->productId);
-//	echo $query . "<br />";
 	if (mysql_query($query) != TRUE)
 		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");
+	
+	$query = sprintf($SELECT_QUANTITY_IN_STOCK_AVAILABLE_FOR_PRODUCT_WITH_ATTRIBUTES, $record->productId);
+	$res = mysql_query($query);
+	if ($res != TRUE)
+		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");
+	
+	$num_records = mysql_num_rows($res);
+	if ($num_records != 1)
+		die("Niepoprawna ilosc (" . $num_records . ") atrybutow dla produktu: " . $record->productId . " Błąd: " . mysql_error() . "<br />");
+	
+	$record_quantity = mysql_fetch_object($res);
+	
+	$query = sprintf($FIX_QUANTITY_IN_STOCK_AVAILABLE_FOR_PRODUCT_WITH_ATTRIBUTES, $record_quantity->quantity, $record->productId);
+	if (mysql_query($query) != TRUE)
+		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");	
 }
 
 echo "Pomyślnie uaktualniono pole quantity w tabeli st_product na podstawie sumy pol quantity z tabeli st_product_attribute (" . count($diffProductsAttribs) . " rekordów)<br />";
+echo "Pomyślnie uaktualniono pole quantity dla produktu w tabeli st_stock_available na podstawie sumy pol quantity dla atrybutow (" . count($diffProductsAttribs) . " rekordów)<br />";
 
 echo "<br />";
 echo "Zakończono pomyślnie!<br />";

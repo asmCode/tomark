@@ -24,8 +24,15 @@ class DiffProduct
 		$this->name = $name;
 		$this->countBefore = (int)$countBefore;
 		$this->countAfter = (int)$countAfter;
-		$this->priceBefore = str_replace(',', '.', $priceBefore);
-		$this->priceAfter = str_replace(',', '.', $priceAfter);
+		$this->priceBefore = (float)str_replace(',', '.', $priceBefore);
+		$this->priceAfter = (float)str_replace(',', '.', $priceAfter);
+	}
+	
+	public function IsUpdateRequired()
+	{
+		return
+			$this->countBefore != $this->countAfter ||
+			$this->priceBefore != $this->priceAfter;
 	}
 }
 

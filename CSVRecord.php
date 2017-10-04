@@ -14,7 +14,7 @@ class CSVRecord
     public function __construct($reference, $price, $count)
 	{
         $this->reference = $reference;
-		$this->price = $price;
+		$this->price = (float)$price;
 		$this->count = $count;
 		
 		$this->existsInProducts = false;
@@ -53,7 +53,11 @@ class CSVRecord
 			if (count($values) != 3)
 				continue;
 				
-			$records[$recordIndex] = new CSVRecord(trim($values[0]), str_replace(' ', '', trim($values[1])), str_replace(' ', '', trim($values[2])));
+			$records[$recordIndex] = new CSVRecord(
+				trim($values[0]),
+				str_replace(',', '.', trim($values[1])),
+				str_replace(',', '.', trim($values[2])));
+				
 			$recordIndex++;
 		}
 		

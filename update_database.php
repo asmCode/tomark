@@ -30,6 +30,9 @@ for ($i = 0; $i < count($diffProducts); $i++)
 {
 	$record = $diffProducts[$i];
 	
+	if (!$record->IsUpdateRequired())
+		continue;
+	
 	$query = sprintf($UPDATE_PRODUCTS, (int)$record->countAfter, $record->priceAfter, $record->productId);
 	if (mysql_query($query) != TRUE)
 		die("Błąd przy wykonywaniu polecenia: " . $query . ". Błąd: " . mysql_error() . "<br />");
@@ -51,6 +54,9 @@ echo "Pomyślnie zaktualizowano ilość w tabeli st_stock_available dla produkt�
 for ($i = 0; $i < count($diffProductsAttribs); $i++)
 {
 	$record = $diffProductsAttribs[$i];
+	
+	if (!$record->IsUpdateRequired())
+		continue;
 	
 	mysql_query("START TRANSACTION");
 	
